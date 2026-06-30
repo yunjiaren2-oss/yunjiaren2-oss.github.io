@@ -3,59 +3,659 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>任蕴佳 (Yunjia Ren) | 个人系统档案与作品集</title>
+    <title>任蕴佳 (Yunjia Ren) | 个人作品集</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Lucide 图标库 -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- 引入复古手写及无衬线字体 -->
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Playfair+Display:ital,wght@0,400;1,400&family=Noto+Serif+SC:wght@300;500;700&display=swap" rel="stylesheet">
+    <!-- 引入复古感与手写感字体 -->
+    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=Kalam:wght@400;700&family=Noto+Serif+SC:wght@300;500;700&display=swap" rel="stylesheet">
     
     <style>
-        /* 1. 超现实 3D 工作台背景与绿草地 */
         body {
-            background-color: #b9ccd5; /* 模拟图2温润的天蓝色 */
             font-family: 'Noto Serif SC', serif;
-            perspective: 1200px; /* 3D 翻开效果所必须 */
+            background: #b0c8d6; /* 还原天蓝色背景 */
+            overflow-x: hidden;
         }
-
-        /* 模拟图2底部的超现实立体绿草地丘陵 */
-        .grassy-hills {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 35vh;
-            background: linear-gradient(to top, #487232 0%, #5d9243 100%);
-            border-top-left-radius: 50% 15%;
-            border-top-right-radius: 50% 15%;
-            z-index: 1;
-            box-shadow: inset 0 20px 40px rgba(0,0,0,0.15);
+        .handwritten {
+            font-family: 'Kalam', cursive;
         }
-        .grassy-hills-back {
-            position: absolute;
-            bottom: 0;
-            left: -10%;
-            width: 120%;
-            height: 42vh;
-            background: linear-gradient(to top, #395c27 0%, #4a7833 100%);
-            border-top-left-radius: 40% 12%;
-            border-top-right-radius: 40% 12%;
-            z-index: 0;
+        .mono-font {
+            font-family: 'Courier Prime', monospace;
         }
-
-        /* 2. 文件夹 3D 翻转动效 */
-        #closed-folder {
+        
+        /* 文件夹开合及翻页动效 */
+        .folder-transition {
             transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s ease;
-            transform-style: preserve-3d;
         }
-        #opened-folder {
-            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.8s ease;
+        
+        /* 双页活页纸张整体翻转动效 */
+        .spread-transition {
+            transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.4s ease;
         }
 
-        /* 3. 红白格子胶带背景模拟 */
-        .plaid-tape {
-            background-color: #f87171;
-            background-image: 
-                repeating-linear-gradient(45deg, rgba(255,255,255,0.4) 0px, rgba(255,255,255,0.4) 2px, transparent 2px, transparent 8px),
-                repeating-linear-gradient(-45deg, rgba(255,255,255,0.4) 0px, rgba(255,255,255,0.4) 2px,
+        /* 拍立得悬挂晃动反馈动效 */
+        .polaroid-card {
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            transform-origin: top center;
+        }
+        .polaroid-card:hover {
+            transform: scale(1.04) rotate(1.5deg) translateY(-6px);
+            box-shadow: 0 15px 30px rgba(74, 62, 51, 0.2);
+            z-index: 10;
+        }
+
+        /* 隐藏滚动条 */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* 模拟打字机超真实皱白纸滤镜背景 (图1风格) */
+        .crumpled-paper {
+            background-color: #fbfbfc;
+            box-shadow: inset 0 0 35px rgba(0,0,0,0.03);
+        }
+
+        /* 叠叠乐卡片抽拉动效 (图3风格) */
+        .marketing-deck-container {
+            position: relative;
+            height: 100%;
+        }
+        .marketing-card {
+            transition: transform 0.5s cubic-bezier(0.165, 0.84, 0.44, 1), z-index 0.5s ease, box-shadow 0.3s ease;
+            position: absolute;
+            left: 0;
+            right: 0;
+            width: 100%;
+            border-radius: 16px 16px 8px 8px;
+        }
+    </style>
+</head>
+<body class="h-screen w-screen overflow-hidden flex items-center justify-center p-4 relative select-none">
+
+    <!-- ==================== 1. 物理褶皱 3D SVG 滤镜定义 (用于完美渲染信纸物理手感) ==================== -->
+    <svg class="hidden">
+        <filter id="paper-wrinkle">
+            <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="5" result="noise" />
+            <feDiffuseLighting in="noise" lighting-color="#fff" surfaceScale="2" result="light">
+                <feDistantLight azimuth="50" elevation="55" />
+            </feDiffuseLighting>
+            <feBlend mode="multiply" in="SourceGraphic" in2="light" result="blend" />
+        </filter>
+    </svg>
+
+    <!-- 背景装饰（原样草地 + 闪烁星空） -->
+    <div class="absolute bottom-0 left-0 right-0 h-40 pointer-events-none z-0">
+        <svg viewBox="0 0 1440 200" fill="none" xmlns="http://www.w3.org/2000/svg" class="absolute bottom-0 w-full">
+            <path d="M0,120 Q360,60 720,130 T1440,100 L1440,200 L0,200 Z" fill="#69854d" opacity="0.8"/>
+            <path d="M0,150 Q400,100 800,160 T1440,130 L1440,200 L0,200 Z" fill="#526f39"/>
+        </svg>
+    </div>
+    <div class="absolute top-24 left-[15%] text-white opacity-40 animate-pulse text-2xl">★</div>
+    <div class="absolute top-48 right-[18%] text-white opacity-50 text-xl">★</div>
+    <div class="absolute bottom-48 left-[8%] text-white opacity-30 text-3xl">★</div>
+
+    <!-- 主视界窗口 -->
+    <div class="w-full max-w-5xl h-[85vh] relative flex items-center justify-center z-10">
+
+        <!-- ==================== 2. 主视觉：闭合的棕色文件夹 (Cover View, 完全保留) ==================== -->
+        <div id="folder-cover" class="folder-transition w-[420px] h-[520px] bg-[#533b2a] rounded-2xl border-2 border-[#3d2a1d] shadow-[0_25px_50px_rgba(40,25,15,0.35)] relative flex flex-col justify-between p-8 cursor-pointer hover:scale-[1.02] transform transition-all duration-300">
+            <!-- 曲别针夹着的内部露出纸张 -->
+            <div class="absolute -top-4 right-12 w-28 h-8 bg-white border border-stone-200 shadow-sm rounded-t-sm z-15 flex justify-center pt-1">
+                <div class="w-2.5 h-10 border-[1.5px] border-stone-400 rounded-full absolute -top-3 z-20 bg-transparent"></div>
+            </div>
+            
+            <!-- 左上角红白格胡蝶结丝带 -->
+            <div class="absolute -top-3 -left-3 z-30 w-16 h-16 pointer-events-none">
+                <svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M10 20 C25 -5, 25 35, 30 30 C35 35, 35 -5, 50 20 C40 25, 20 25, 10 20 Z" fill="#cf5044" />
+                    <rect x="26" y="24" width="8" height="8" rx="2" fill="#b93b30" />
+                    <path d="M10 20 L50 20 M20 5 L40 45" stroke="#ffffff" stroke-width="1" stroke-dasharray="2 2" />
+                    <path d="M28 30 L15 50 M32 30 L45 48" stroke="#cf5044" stroke-width="3" stroke-linecap="round"/>
+                </svg>
+            </div>
+
+            <!-- 主文案 -->
+            <div class="flex-1 flex flex-col justify-center items-center text-center mt-6">
+                <h1 class="handwritten text-white text-6xl tracking-wider select-none font-bold">Postfolio</h1>
+                <p class="text-[10px] text-stone-300 tracking-[0.25em] font-mono mt-2 select-none">Yunjia Ren's Archive</p>
+                <p class="text-xs text-stone-400 font-serif italic mt-20 opacity-80 animate-bounce">▲ 点击翻开档案文件夹</p>
+            </div>
+
+            <div class="text-center font-serif italic text-stone-400 text-xs select-none">Post Design · 2026</div>
+
+            <!-- 贴纸 1 -->
+            <div class="absolute -left-16 top-24 w-32 bg-white p-2 pb-4 border border-stone-200 shadow-lg transform -rotate-12 rounded-sm no-select">
+                <div class="absolute -top-3 left-6 w-12 h-5 bg-[#e2938a] opacity-80 transform rotate-12 border-l border-r border-dashed border-stone-400/40"></div>
+                <div class="w-full aspect-[4/3] bg-stone-800 rounded-sm overflow-hidden flex items-center justify-center">
+                    <span class="text-white text-[8px] font-mono uppercase opacity-55">The art of Escape</span>
+                </div>
+                <p class="handwritten text-[10px] text-stone-600 text-center mt-2 font-bold leading-none">The art of Escape</p>
+            </div>
+
+            <!-- 贴纸 2 -->
+            <div class="absolute -right-16 bottom-16 w-32 bg-white p-2 pb-4 border border-stone-200 shadow-lg transform rotate-12 rounded-sm no-select">
+                <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 w-6 h-6 z-10">
+                    <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M14 18 C14 8, 26 8, 26 18" stroke="#a8a29e" stroke-width="2" fill="none"/>
+                        <rect x="10" y="16" width="20" height="12" rx="2" fill="#ec4899" />
+                    </svg>
+                </div>
+                <div class="w-full aspect-[4/3] bg-stone-900 rounded-sm overflow-hidden flex items-center justify-center">
+                    <span class="text-white text-[8px] font-mono uppercase opacity-55">Stuck in the Void</span>
+                </div>
+                <p class="handwritten text-[10px] text-stone-600 text-center mt-2 font-bold leading-none">Stuck in the Void</p>
+            </div>
+        </div>
+
+        <!-- ==================== 3. 活页册翻开后的双页内容视图 (Open Folder Spread View) ==================== -->
+        <div id="folder-opened" class="folder-transition hidden w-full h-full bg-[#fbfaf7] rounded-3xl border-2 border-stone-300 shadow-[0_25px_60px_rgba(74,62,51,0.25)] flex overflow-hidden relative z-10">
+            
+            <!-- 活页本中央物理折页暗影 -->
+            <div class="absolute top-0 bottom-0 left-1/2 w-4 bg-gradient-to-r from-transparent via-stone-400/20 to-transparent z-20 pointer-events-none"></div>
+
+            <!-- 活页夹右侧探出的三个主跨页切页大标签 (Manila Index Tabs, 完美还原图 3 活页夹层级) [2.1] -->
+            <div class="absolute right-0 top-1/2 transform -translate-y-1/2 flex flex-col gap-3.5 z-40 select-none">
+                <button onclick="switchSpread(1)" id="tab-btn-1" class="px-2 py-3.5 bg-[#fbfaf7] text-stone-900 border border-stone-300 border-r-transparent rounded-l-xl text-[9px] font-bold flex flex-col items-center gap-1 transition-all duration-300 w-8 shadow-md z-30 translate-x-[-2px]">
+                    <i data-lucide="user" class="w-3.5 h-3.5"></i>关于 & 漫画
+                </button>
+                <button onclick="switchSpread(2)" id="tab-btn-2" class="px-2 py-3.5 bg-stone-100 text-stone-400 border border-stone-300 border-r-transparent rounded-l-xl text-[9px] font-bold flex flex-col items-center gap-1 transition-all duration-300 w-7 shadow-sm z-10 translate-x-0">
+                    <i data-lucide="trending-up" class="w-3.5 h-3.5"></i>营销 & 活动
+                </button>
+                <button onclick="switchSpread(3)" id="tab-btn-3" class="px-2 py-3.5 bg-stone-100 text-stone-400 border border-stone-300 border-r-transparent rounded-l-xl text-[9px] font-bold flex flex-col items-center gap-1 transition-all duration-300 w-7 shadow-sm z-10 translate-x-0">
+                    <i data-lucide="terminal" class="w-3.5 h-3.5"></i>报道 & 联系
+                </button>
+            </div>
+
+            <!-- ==========================================
+                 跨页 1 (Spread 1): 个人信息（打字机） + 科普类脚本策划
+                 ========================================== -->
+            <div id="spread-1" class="spread-transition w-full h-full flex shrink-0">
+                <!-- 【左半页】 第一页：个人基本信息与教育经历 (打字机纸张，图 1 风格) -->
+                <div class="w-1/2 h-full border-r border-stone-200 p-6 flex flex-col justify-between bg-stone-100/30 relative overflow-hidden">
+                    <div class="flex-1 w-full max-h-[72%] border border-stone-300/80 rounded-lg p-5 overflow-y-auto shadow-inner relative z-10 no-scrollbar" 
+                         style="filter: url(#paper-wrinkle); background: #fdfdfc;">
+                        <div class="space-y-4">
+                            <div class="text-center border-b border-stone-300/60 pb-3">
+                                <span class="text-[9px] font-mono bg-zinc-800 text-zinc-100 px-2 py-0.5 rounded tracking-widest uppercase">RENYUNJIA_OS / DOC_01</span>
+                                <h2 class="text-xl font-bold font-serif text-stone-900 mt-2">任蕴佳 / Yunjia Ren</h2>
+                                <p class="text-[10px] text-stone-500 font-mono mt-1">15337053496 | taot1007@163.com | 上海</p>
+                                <p class="text-[9px] text-stone-400 font-mono mt-0.5">24岁 | 中共党员 | 2027届研在读</p>
+                            </div>
+                            <div class="space-y-2">
+                                <h4 class="text-xs font-bold text-stone-800 tracking-wider uppercase border-b border-stone-200 pb-0.5">🎓 教育经历 / Education</h4>
+                                <div class="text-[11px] leading-relaxed space-y-2">
+                                    <div>
+                                        <p class="font-bold text-stone-900 flex justify-between">
+                                            <span>同济大学 · 新闻传播学 (硕士)</span>
+                                            <span class="text-[9px] text-stone-400 font-mono">2024.09 - 2027.06</span>
+                                        </p>
+                                        <p class="text-stone-500">艺术与传媒学院 · GPA 3.91/4.0 | 双一流 / 985</p>
+                                    </div>
+                                    <div>
+                                        <p class="font-bold text-stone-900 flex justify-between">
+                                            <span>北京外国语大学 · 新闻学 (本科)</span>
+                                            <span class="text-[9px] text-stone-400 font-mono">2020.09 - 2024.06</span>
+                                        </p>
+                                        <p class="text-stone-500">国新学院 | GPA 3.6/4.0 | 辅修外交学 GPA 3.8/4.0 (211)</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="space-y-1.5 text-[10px] text-stone-600">
+                                <h4 class="text-xs font-bold text-stone-800 border-b border-stone-200 pb-0.5">🛠️ 核心能力 / Core Tech</h4>
+                                <p><strong>精细运营：</strong> 0到1内容全链路闭环，擅长小红书自然爆款，4年漫画脚本共创经验</p>
+                                <p><strong>实操战绩：</strong> 小红书AI增长产品新增用户 <strong>412%</strong>；新世相品牌线下大展 <strong>观展4w+</strong></p>
+                                <p><strong>核心技能：</strong> 熟练使剪映 ｜ Photoshop ｜ Canva ｜ 秀米，CET-6</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 底部粉色打字机本体 (图 1 风格) [1.1] -->
+                    <div class="w-full h-28 bg-gradient-to-t from-[#f19fb1] to-[#e48398] border-t-4 border-[#c75d74] rounded-t-2xl shadow-[0_-5px_15px_rgba(199,93,116,0.25)] p-2.5 flex flex-col justify-end relative z-20">
+                        <div class="w-[90%] mx-auto h-1.5 bg-stone-700 rounded-sm shadow-inner -mt-4 border-b border-stone-900"></div>
+                        <div class="grid grid-cols-8 gap-1 px-4 pt-1 flex-1 items-center">
+                            <div class="w-3.5 h-3.5 bg-[#efa4b3] border border-[#d2627a] rounded-full shadow-sm flex items-center justify-center text-[6px] text-[#8e293e] font-bold">Q</div>
+                            <div class="w-3.5 h-3.5 bg-[#efa4b3] border border-[#d2627a] rounded-full shadow-sm flex items-center justify-center text-[6px] text-[#8e293e] font-bold">W</div>
+                            <div class="w-3.5 h-3.5 bg-[#efa4b3] border border-[#d2627a] rounded-full shadow-sm flex items-center justify-center text-[6px] text-[#8e293e] font-bold">E</div>
+                            <div class="w-3.5 h-3.5 bg-[#efa4b3] border border-[#d2627a] rounded-full shadow-sm flex items-center justify-center text-[6px] text-[#8e293e] font-bold">R</div>
+                            <div class="w-3.5 h-3.5 bg-[#efa4b3] border border-[#d2627a] rounded-full shadow-sm flex items-center justify-center text-[6px] text-[#8e293e] font-bold">T</div>
+                            <div class="w-3.5 h-3.5 bg-[#efa4b3] border border-[#d2627a] rounded-full shadow-sm flex items-center justify-center text-[6px] text-[#8e293e] font-bold">Y</div>
+                            <div class="w-3.5 h-3.5 bg-[#efa4b3] border border-[#d2627a] rounded-full shadow-sm flex items-center justify-center text-[6px] text-[#8e293e] font-bold">U</div>
+                            <div class="w-3.5 h-3.5 bg-[#efa4b3] border border-[#d2627a] rounded-full shadow-sm flex items-center justify-center text-[6px] text-[#8e293e] font-bold">I</div>
+                            
+                            <div class="w-3.5 h-3.5 bg-[#efa4b3] border border-[#d2627a] rounded-full shadow-sm flex items-center justify-center text-[6px] text-[#8e293e] font-bold">A</div>
+                            <div class="w-3.5 h-3.5 bg-[#efa4b3] border border-[#d2627a] rounded-full shadow-sm flex items-center justify-center text-[6px] text-[#8e293e] font-bold">S</div>
+                            <div class="w-3.5 h-3.5 bg-[#efa4b3] border border-[#d2627a] rounded-full shadow-sm flex items-center justify-center text-[6px] text-[#8e293e] font-bold">D</div>
+                            <div class="w-3.5 h-3.5 bg-[#efa4b3] border border-[#d2627a] rounded-full shadow-sm flex items-center justify-center text-[6px] text-[#8e293e] font-bold">F</div>
+                            <div class="w-3.5 h-3.5 bg-[#efa4b3] border border-[#d2627a] rounded-full shadow-sm flex items-center justify-center text-[6px] text-[#8e293e] font-bold">G</div>
+                            <div class="w-3.5 h-3.5 bg-[#efa4b3] border border-[#d2627a] rounded-full shadow-sm flex items-center justify-center text-[6px] text-[#8e293e] font-bold">H</div>
+                            <div class="w-3.5 h-3.5 bg-[#efa4b3] border border-[#d2627a] rounded-full shadow-sm flex items-center justify-center text-[6px] text-[#8e293e] font-bold">J</div>
+                            <div class="w-3.5 h-3.5 bg-[#efa4b3] border border-[#d2627a] rounded-full shadow-sm flex items-center justify-center text-[6px] text-[#8e293e] font-bold">K</div>
+                        </div>
+                        <button onclick="closeFolder()" class="text-[9px] text-[#8e293e] hover:text-stone-900 flex items-center justify-center gap-1 pb-1 transition font-bold select-none">
+                            <i data-lucide="folder-closed" class="w-3 h-3"></i> 合上文件夹 (Close)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 【右半页】 第二页：科普类漫画脚本作品 (完全保留原样不变) -->
+                <div class="w-1/2 h-full p-6 flex flex-col justify-between overflow-hidden bg-white pr-10 relative">
+                    <div class="border-b border-stone-200 pb-3 mb-4 shrink-0">
+                        <span class="text-[9px] font-mono tracking-widest text-amber-800 bg-amber-50 px-2 py-0.5 rounded border border-amber-200/50 uppercase">02 / SCIENCE</span>
+                        <h3 class="text-lg font-serif font-bold text-stone-900 mt-2">科普类漫画脚本作品</h3>
+                        <p class="text-[9px] text-stone-400 font-mono mt-0.5">✨ 介绍词：和我一起来探索十万个为什么吧</p>
+                    </div>
+                    <!-- 30 个原封不动拍立得作品墙 -->
+                    <div class="flex-1 overflow-y-auto no-scrollbar pb-6">
+                        <div id="grid-science" class="grid grid-cols-2 md:grid-cols-3 gap-6 p-1"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==========================================
+                 跨页 2 (Spread 2): 内容营销（叠叠卡，图3风格） + 项目活动（先占位）
+                 ========================================== -->
+            <div id="spread-2" class="spread-transition w-full h-full flex shrink-0 hidden">
+                <!-- 【左半页】 第三页：内容营销策划 (叠叠乐文件夹，像素级复刻图 3 物理叠卡) [2.1] -->
+                <div class="w-1/2 h-full border-r border-stone-200 p-6 flex flex-col justify-between bg-stone-100/30 overflow-hidden relative">
+                    <div class="border-b border-stone-200 pb-3 mb-4 shrink-0">
+                        <span class="text-[9px] font-mono tracking-widest text-amber-800 bg-amber-50 px-2 py-0.5 rounded border border-amber-200/50 uppercase">03 / MARKETING</span>
+                        <h3 class="text-lg font-serif font-bold text-stone-900 mt-1">内容营销策划</h3>
+                    </div>
+
+                    <!-- 拟物叠叠乐卡纸背景 (图 3 深灰褐色磨砂纸板底) -->
+                    <div class="flex-1 bg-[#23201d] rounded-2xl border border-stone-800 p-4 shadow-inner relative overflow-y-auto no-scrollbar flex flex-col justify-start">
+                        <div class="marketing-deck-container flex flex-col space-y-2.5">
+                            
+                            <!-- 文件夹一：内容策划与写作 (卡其黄色，图 2/3，Tab偏左) [2.1] -->
+                            <div id="fold-writing" class="marketing-folder bg-[#c7be6d] rounded-xl border border-[#b3a85b] shadow-sm overflow-hidden flex flex-col shrink-0">
+                                <button onclick="toggleFolder('writing')" class="w-full px-4 py-3 bg-[#b2a95c] flex justify-between items-center text-xs font-bold text-stone-900 hover:bg-[#a1964d] transition relative">
+                                    <span class="tracking-wide flex items-center gap-1.5"><i data-lucide="edit-3" class="w-3.5 h-3.5"></i> 一、内容策划与写作</span>
+                                    <i data-lucide="chevron-down" class="w-3.5 h-3.5 transition-transform duration-300" id="icon-writing"></i>
+                                </button>
+                                <div id="content-writing" class="hidden p-4 space-y-3 bg-[#fdfaf2] text-stone-700 text-xs">
+                                    <p class="leading-relaxed font-light text-stone-600 border-b border-stone-200/60 pb-2">
+                                        参与内容选题策划、提报，设计采访提纲并完成人物采访与信息整理，通过捕捉⽤⼾情绪与共鸣点，将故事转化为具有传播力的内容表达，多篇内容阅读量达10w+，并拓展播客等内容形式。
+                                    </p>
+                                    <div class="space-y-2">
+                                        <p class="font-bold text-stone-800 text-[9px] tracking-wider uppercase">📄 微信公众号文章：</p>
+                                        <div class="grid grid-cols-1 gap-1.5 pl-2 font-mono text-[10px] text-amber-900">
+                                            <a href="https://mp.weixin.qq.com/s/xaVrpZ2IvhLJhAbBylykZg" target="_blank" class="hover:underline flex items-center gap-1"><i data-lucide="link" class="w-3 h-3 text-stone-400"></i> [ 微信作品链接 1 ] ↗</a>
+                                            <a href="https://mp.weixin.qq.com/s/oV8KYvt0LDORPYSTM8ZOww" target="_blank" class="hover:underline flex items-center gap-1"><i data-lucide="link" class="w-3 h-3 text-stone-400"></i> [ 微信作品链接 2 ] ↗</a>
+                                            <a href="https://mp.weixin.qq.com/s/RvI1mAFk_RmCOKlfYb2WRQ" target="_blank" class="hover:text-amber-800 hover:underline flex items-center gap-1"><i data-lucide="link" class="w-3 h-3 text-stone-400"></i> [ 微信作品链接 3 ] ↗</a>
+                                            <a href="https://mp.weixin.qq.com/s/xPJ1sck8cbV4diDat6HVlA" target="_blank" class="hover:text-amber-800 hover:underline flex items-center gap-1"><i data-lucide="link" class="w-3 h-3 text-stone-400"></i> [ 微信作品链接 4 ] ↗</a>
+                                        </div>
+                                        <p class="font-bold text-stone-800 text-[9px] tracking-wider uppercase mt-1">📕 小红书策划：</p>
+                                        <div class="pl-2 font-mono text-[10px] text-amber-900">
+                                            <a href="http://xhslink.com/o/2EcfsdvWRVR" target="_blank" class="hover:underline flex items-center gap-1"><i data-lucide="link" class="w-3 h-3 text-stone-400"></i> [ 小红书内容链接 ] ↗</a>
+                                        </div>
+                                        <p class="font-bold text-stone-800 text-[9px] tracking-wider uppercase mt-1">🌌 小宇宙播客：</p>
+                                        <div class="pl-2 font-mono text-[10px] text-amber-900">
+                                            <a href="https://www.xiaoyuzhoufm.com/episode/6939096c498c58d63aa9ac9b" target="_blank" class="hover:underline flex items-center gap-1"><i data-lucide="mic" class="w-3 h-3 text-stone-400"></i> [ 小宇宙单期节目 ] ↗</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 文件夹二：二、品牌营销 (柔粉色，图 2/3，Tab 居中) [2.1] -->
+                            <div id="fold-brand" class="marketing-folder bg-[#e8afb7] rounded-xl border border-[#dca1aa] shadow-sm overflow-hidden flex flex-col shrink-0">
+                                <button onclick="toggleFolder('brand')" class="w-full px-4 py-3 bg-[#d89ba3] flex justify-between items-center text-xs font-bold text-stone-900 hover:bg-[#c98c94] transition relative">
+                                    <span class="tracking-wide flex items-center gap-1.5"><i data-lucide="award" class="w-3.5 h-3.5"></i> 二、品牌营销</span>
+                                    <i data-lucide="chevron-down" class="w-3.5 h-3.5 transition-transform duration-300" id="icon-brand"></i>
+                                </button>
+                                <div id="content-brand" class="hidden p-4 space-y-3 bg-[#fdfafb] text-stone-700 text-[11px]">
+                                    <p class="leading-relaxed font-light text-stone-600 border-b border-stone-200/60 pb-2">
+                                        参与品牌合作内容策划与执行，能够在品牌需求与用户表达之间进行转化，在保证品牌表达的前提下，增强内容的用户共鸣与传播性。
+                                    </p>
+                                    <div class="space-y-2">
+                                        <p class="font-bold text-stone-800 text-[9px] tracking-wider uppercase">🎁 美团合作：</p>
+                                        <div class="pl-2 font-mono text-[10px] text-rose-900">
+                                            <a href="https://mp.weixin.qq.com/s/-uZ4nlpmbla-25HiQyt9vQ" target="_blank" class="hover:underline flex items-center gap-1"><i data-lucide="link" class="w-3 h-3 text-stone-400"></i> [ 美团品牌推文 ] ↗</a>
+                                        </div>
+                                        <p class="font-bold text-stone-800 text-[9px] tracking-wider uppercase mt-1">🚗 奥迪 (AUDI) 合作：</p>
+                                        <div class="grid grid-cols-1 gap-1.5 pl-2 font-mono text-[10px] text-rose-900">
+                                            <a href="http://xhslink.com/o/28jGwj56Wvg" target="_blank" class="hover:underline flex items-center gap-1"><i data-lucide="instagram" class="w-3 h-3 text-stone-400"></i> [ 奥迪小红书策划 ] ↗</a>
+                                            <a href="https://mp.weixin.qq.com/s/0wgcsSqo1ghpMj316JZ4LA" target="_blank" class="hover:underline flex items-center gap-1"><i data-lucide="link" class="w-3 h-3 text-stone-400"></i> [ 奥迪微信推文 ] ↗</a>
+                                            <span class="text-stone-400 flex items-center gap-1"><i data-lucide="slash" class="w-3 h-3"></i> 奥迪微博线 [建设中]</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 文件夹三：三、个人小红书账号爆款作品 (深红褐色，图 2/3，Tab 偏右) [2.1] -->
+                            <div id="fold-red" class="marketing-folder bg-[#8d1c24] rounded-xl border border-[#79141c] shadow-sm overflow-hidden flex flex-col shrink-0 relative">
+                                <!-- 实体别针装饰 (图3/图2复古杂货) [2.1] -->
+                                <div class="absolute right-12 top-2 z-20 w-6 h-6 pointer-events-none drop-shadow-sm">
+                                    <svg viewBox="0 0 40 40" fill="none" class="w-6 h-6">
+                                        <path d="M14 18 C14 8, 26 8, 26 18" stroke="#f43f5e" stroke-width="2.5" fill="none"/>
+                                        <rect x="10" y="16" width="20" height="12" rx="2" fill="#faf7f2" />
+                                    </svg>
+                                </div>
+
+                                <button onclick="toggleFolder('red')" class="w-full px-4 py-2.5 bg-[#78141b] flex justify-between items-center text-xs font-bold text-white hover:bg-[#641016] transition relative">
+                                    <span class="tracking-wide flex items-center gap-1.5"><i data-lucide="instagram" class="w-3.5 h-3.5 text-rose-300"></i> 三、个人小红书账号爆款作品</span>
+                                    <i data-lucide="chevron-down" class="w-3.5 h-3.5 transition-transform duration-300" id="icon-red"></i>
+                                </button>
+                                
+                                <div id="content-red" class="hidden p-4 space-y-3.5 bg-[#faf5f5] text-stone-700 text-xs overflow-y-auto max-h-[220px] no-scrollbar">
+                                    <div class="p-3 bg-white border border-stone-200 rounded-lg shadow-sm space-y-1.5">
+                                        <div class="flex justify-between items-start border-b border-stone-100 pb-1">
+                                            <a href="http://xhslink.com/o/2pSHJtUR59g" target="_blank" class="font-bold text-stone-900 hover:text-amber-800 hover:underline flex items-center gap-1">
+                                                💡 6个月没学到1000h的上岸记录 ↗
+                                            </a>
+                                            <span class="text-[8px] bg-red-50 text-red-600 border border-red-200 px-1.5 rounded-full font-mono scale-90">6W+ 浏览</span>
+                                        </div>
+                                        <p class="text-[9px] text-stone-400 font-mono">数据：6w+浏览 ｜ 3k+点赞 ｜ 1k+收藏</p>
+                                        <p class="text-[10px] text-stone-500 leading-relaxed font-light">
+                                            <strong>运营阐释：</strong>当时是想要记录自己的考研过程，剪一路生花的人实在是太多太多了，大多数作品同质化叙事没有新意。但其中很大一部分考研人的状态是焦虑但没有付出很多行动，因此，纯粹的努力焦虑叙事会增强用户的负罪感和负面情绪。在此背景下，该作品以「6个月没学到1000h的上岸记录」为题，用直观的数字对比呈现反差吸引点击，通过急促音乐交叉呈现考研记录和放松玩乐场景，并运用文字锐评打造幽默氛围，基于考研焦虑情绪这一共鸣点，切准情绪，基于幽默内容，成为爆款。
+                                        </p>
+                                    </div>
+
+                                    <div class="p-3 bg-white border border-stone-200 rounded-lg shadow-sm space-y-1.5">
+                                        <div class="flex justify-between items-start border-b border-stone-100 pb-1">
+                                            <a href="http://xhslink.com/o/8ipjh6nzpY9" target="_blank" class="font-bold text-stone-900 hover:text-amber-800 hover:underline flex items-center gap-1">
+                                                💡 怎么高质量的水一篇课程论文（三步搞定） ↗
+                                            </a>
+                                            <span class="text-[8px] bg-red-50 text-red-600 border border-red-200 px-1.5 rounded-full font-mono scale-90">3W+ 浏览</span>
+                                        </div>
+                                        <p class="text-[9px] text-stone-400 font-mono">数据：3w+浏览 ｜ 2k+点赞 ｜ 3k+收藏</p>
+                                        <p class="text-[10px] text-stone-500 leading-relaxed font-light">
+                                            <strong>运营阐释：</strong>在期末周，“论文写作”是高频刚需内容，但大多数内容存在：学术性强难理解，方法抽象难执行。该作品基于“利他性”出发，用清晰明了的步骤，简单好理解的语言，手把手教学一篇论文的操作方式，实操干货式笔记如何跑通为爆款。
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 【右半页】 第四页：项目活动策划 (原汁原味物理先占位) -->
+                <div class="w-1/2 h-full p-6 flex flex-col justify-between overflow-hidden bg-white pr-10 relative">
+                    <div class="border-b border-stone-200 pb-3 mb-4 shrink-0">
+                        <span class="text-[9px] font-mono tracking-widest text-purple-800 bg-purple-50 px-2 py-0.5 rounded border border-purple-200/50 uppercase">04 / CAMPAIGNS</span>
+                        <h3 class="text-lg font-serif font-bold text-stone-900 mt-2">四、项目活动策划</h3>
+                        <p class="text-[9px] text-stone-400 font-mono mt-0.5">✨ 线下营销 / 整合 Campaign 活动池</p>
+                    </div>
+                    <div class="flex-1 flex flex-col items-center justify-center text-center space-y-4">
+                        <div class="p-4 bg-stone-100 rounded-full text-stone-400">
+                            <i data-lucide="lock" class="w-12 h-12"></i>
+                        </div>
+                        <h3 class="text-sm font-bold text-stone-800">项目活动案例库加载中</h3>
+                        <p class="text-stone-500 text-xs max-w-xs font-light leading-relaxed">
+                            包含“晚安短信”线下营销、妇女节营销 Campaign 以及观展 4W+ 的“给100位女性辈的画展”案例重构，敬请期待。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==========================================
+                 跨页 3 (Spread 3): 深度报道 (左) + 联系方式 (右)
+                 ========================================== -->
+            <div id="spread-3" class="spread-transition w-full h-full flex shrink-0 hidden">
+                <!-- 【左半页】 第五页：深度报道与新闻采访 (物理先占位) -->
+                <div class="w-1/2 h-full border-r border-stone-200 p-6 flex flex-col justify-between bg-stone-100/30 overflow-hidden relative">
+                    <div class="border-b border-stone-200 pb-3 mb-4 shrink-0">
+                        <span class="text-[9px] font-mono tracking-widest text-blue-800 bg-blue-50 px-2 py-0.5 rounded border border-blue-200/50 uppercase">05 / REPORTING</span>
+                        <h3 class="text-lg font-serif font-bold text-stone-900 mt-1">五、深度报道与采访</h3>
+                    </div>
+                    <div class="flex-1 flex flex-col items-center justify-center text-center space-y-4">
+                        <div class="p-4 bg-stone-100 rounded-full text-stone-400">
+                            <i data-lucide="award" class="w-12 h-12"></i>
+                        </div>
+                        <h3 class="text-sm font-bold text-stone-800">深度调查作品库加载中</h3>
+                        <p class="text-stone-500 text-xs max-w-xs font-light leading-relaxed">
+                            澎湃新闻调查稿引发行业广泛整改的深度报道、人物采写案例归档中，敬请期待。
+                        </p>
+                    </div>
+                </div>
+
+                <!-- 【右半页】 第六页：联系我 (高拟物化便签写字板) -->
+                <div class="w-1/2 h-full p-6 flex flex-col justify-between overflow-hidden bg-white pr-10 relative">
+                    <div class="border-b border-stone-200 pb-3 mb-4 shrink-0">
+                        <span class="text-[9px] font-mono tracking-widest text-slate-800 bg-slate-100 px-2 py-0.5 rounded border border-slate-200 uppercase">06 / CONNECT</span>
+                        <h3 class="text-lg font-serif font-bold text-stone-900 mt-2">六、与我聊聊合作？</h3>
+                        <p class="text-[9px] text-stone-400 font-mono mt-0.5">✨ System connection is online</p>
+                    </div>
+                    
+                    <!-- 写字板/便签条拟物 -->
+                    <div class="flex-1 bg-stone-50 border border-stone-200 rounded-xl p-5 shadow-sm space-y-4 flex flex-col justify-between">
+                        <div class="space-y-3">
+                            <p class="text-xs text-stone-500 leading-relaxed font-light">
+                                目前正积极寻找 <strong>内容策划、增长营销、活动运营</strong> 方向的高价值全职工作、项目合作或顾问咨询机会。
+                            </p>
+                            <!-- 简易复古文本框 -->
+                            <div class="bg-zinc-900 text-zinc-100 p-4 rounded-lg font-mono text-xs space-y-1.5 shadow-inner">
+                                <p class="text-zinc-500">// Terminal Command Info</p>
+                                <p><span class="text-emerald-400">$</span> cat email.txt</p>
+                                <p class="text-zinc-300">taot1007@163.com</p>
+                                <p><span class="text-emerald-400">$</span> cat wechat.txt</p>
+                                <p class="text-zinc-300">15337053496 (上海)</p>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col sm:flex-row gap-3">
+                            <a href="mailto:taot1007@163.com" class="bg-stone-900 text-stone-50 text-xs font-semibold px-4 py-2.5 rounded-lg hover:bg-stone-800 text-center transition">发送邮件邮件</a>
+                            <button onclick="navigator.clipboard.writeText('15337053496'); alert('微信/手机号 15337053496 已复制成功！');" class="bg-white border border-stone-200 text-stone-700 text-xs font-semibold px-4 py-2.5 rounded-lg hover:bg-stone-50 transition">复制我的微信</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- 模拟桌面页脚 -->
+    <div class="absolute bottom-2 text-center text-[10px] tracking-wider text-zinc-400 font-mono uppercase">
+        © 2026 YUNJIA REN OS · TAB FILES ACCORDING TO DOSSIER
+    </div>
+
+    <script>
+        // 30个科普脚本文章的100%真实链接 (原封不动)
+        const scienceLinks = [
+            "https://mp.weixin.qq.com/s/YaXUmK99LGWC6W7d_emtkw",
+            "https://mp.weixin.qq.com/s/VsvHOOgj8RxckbljKOWBjw",
+            "https://mp.weixin.qq.com/s/TYzVo1gcNZ6Hk4YJnz3MdA",
+            "https://mp.weixin.qq.com/s/Oj8AmFe2WW63HpjpUrVjBg",
+            "https://mp.weixin.qq.com/s/JWViPvwS9qDSXWzTXicrag",
+            "https://mp.weixin.qq.com/s/fFUtdJ2mM5zWjmXqlXc6XA",
+            "https://mp.weixin.qq.com/s/_DvPO25BiGr-gh2uNxnzCA",
+            "https://mp.weixin.qq.com/s/5WUFc0dQlOfc-yxp309zag",
+            "https://mp.weixin.qq.com/s/OFsZTAPGhFqIiAFlMH4qAA",
+            "https://mp.weixin.qq.com/s/HZLVn_vzalhVZWFPHN4Y-g",
+            "https://mp.weixin.qq.com/s/WNsod3NnOxczAcx-ZDkaMg",
+            "https://mp.weixin.qq.com/s/JH5oeQ5PY3dfAMyIizjBow",
+            "https://mp.weixin.qq.com/s/E0m0hXXgkdWUdKiJNr3Rgg",
+            "https://mp.weixin.qq.com/s/tjvoDTY1vkJNSXY8ay3thA",
+            "https://mp.weixin.qq.com/s/NAoqjwbB0JnxZZyLiIk4uQ",
+            "https://mp.weixin.qq.com/s/kIA-a4sMgQyg-s8RXUXdbg",
+            "https://mp.weixin.qq.com/s/PZSgOspKNg-ke3ZJGpI_1A",
+            "https://mp.weixin.qq.com/s/fI8ao0mEqT-9VfUaDBU5Yg",
+            "https://mp.weixin.qq.com/s/68fVR2AeH61YksuitRAxtA",
+            "https://mp.weixin.qq.com/s/jtQrtLk8m6Ntj_LCo8mE4Q",
+            "https://mp.weixin.qq.com/s/M1pfiT3qB8Bl-Zzv393t1Q",
+            "https://mp.weixin.qq.com/s/R3mryhZtlAGpf8ry9BZBVQ",
+            "https://mp.weixin.qq.com/s/pwluBT7WFqZ25deIxRqMLw",
+            "https://mp.weixin.qq.com/s/capCJL-_5GjKTOn4_fG4fg",
+            "https://mp.weixin.qq.com/s/Q17a9AcrIhZ9jdNS6HILsQ",
+            "https://mp.weixin.qq.com/s/mXWEwwuodu7fTl79FnWXAA",
+            "https://mp.weixin.qq.com/s/wBFSDSKNbLE39gYxtisikQ",
+            "https://mp.weixin.qq.com/s/JGZu0ujh-9YF5gyqGnq2JA",
+            "https://mp.weixin.qq.com/s/7BAFFDgznjg1Lmwz2TTXbg",
+            "https://mp.weixin.qq.com/s/ejwtH9Cm9W2cQuIBaaqiEQ"
+        ];
+
+        // 4种圆头夹、波点夹、Penco扁平夹、长尾黑色夹拟物SVG
+        const clipsSVG = [
+            // Penco 绿色扁平夹
+            `<svg viewBox="0 0 40 40" fill="none" class="w-8 h-8 absolute -top-3.5 left-1/2 transform -translate-x-1/2 z-20 drop-shadow-sm">
+                <rect x="6" y="16" width="28" height="10" rx="1.5" fill="#88b598" />
+                <path d="M15 16 L15 12 A1 1 0 0 1 25 12 L25 16" stroke="#88b598" stroke-width="2.5" fill="none" />
+                <circle cx="20" cy="11" r="1.5" fill="#faf7f2"/>
+                <rect x="14" y="20" width="12" height="2" fill="#6f987d" />
+            </svg>`,
+            // 经典复古长尾夹 (图1第三个)
+            `<svg viewBox="0 0 40 40" fill="none" class="w-7 h-7 absolute -top-4 left-1/2 transform -translate-x-1/2 z-20 drop-shadow-sm">
+                <path d="M13 18 C13 7, 27 7, 27 18" stroke="#a3a3a3" stroke-width="2" fill="none"/>
+                <rect x="9" y="17" width="22" height="11" rx="2" fill="#2d2a26" />
+                <line x1="12" y1="17" x2="28" y2="17" stroke="#57534e" stroke-width="0.5"/>
+            </svg>`,
+            // 粉色经典长尾夹
+            `<svg viewBox="0 0 40 40" fill="none" class="w-8 h-8 absolute -top-3.5 left-1/2 transform -translate-x-1/2 z-20 drop-shadow-sm">
+                <path d="M13 18 C13 8, 27 8, 27 18" stroke="#a3a3a3" stroke-width="2" fill="none"/>
+                <rect x="9" y="17" width="22" height="11" rx="2" fill="#ec4899" />
+            </svg>`,
+            // 亮黄色波点圆头夹 (图1第三行右侧)
+            `<svg viewBox="0 0 40 40" fill="none" class="w-8 h-8 absolute -top-3.5 left-1/2 transform -translate-x-1/2 z-20 drop-shadow-sm">
+                <circle cx="20" cy="11" r="5" stroke="#ca8a04" stroke-width="2.5" fill="none" />
+                <rect x="8" y="16" width="24" height="12" rx="3" fill="#eab308" />
+                <circle cx="12" cy="20" r="1.5" fill="#ffffff" /><circle cx="20" cy="22" r="1.5" fill="#ffffff" /><circle cx="28" cy="20" r="1.5" fill="#ffffff" />
+            </svg>`
+        ];
+
+        // 3. 动态生成 30 张拍立得作品卡片 (保持原样不变)
+        function buildScienceDossier() {
+            const grid = document.getElementById('grid-science');
+            grid.innerHTML = '';
+
+            scienceLinks.forEach((link, index) => {
+                const clipHtml = clipsSVG[index % clipsSVG.length];
+                const randomRotate = (Math.random() * 2 - 1).toFixed(2);
+                
+                const card = document.createElement('a');
+                card.href = link;
+                card.target = "_blank";
+                card.className = "polaroid-card bg-white p-2.5 pb-4 rounded-sm shadow-sm border border-stone-200 relative flex flex-col justify-between cursor-pointer";
+                card.style.transform = `rotate(${randomRotate}deg)`;
+                
+                card.innerHTML = `
+                    ${clipHtml}
+                    <div class="w-full aspect-[4/3] bg-stone-50 rounded-sm overflow-hidden border border-stone-100 flex flex-col items-center justify-center relative">
+                        <div class="text-stone-300 flex flex-col items-center gap-1">
+                            <i data-lucide="image" class="w-5 h-5"></i>
+                            <span class="text-[7px] font-mono tracking-widest text-stone-400 uppercase">VOL. ${(index + 1).toString().padStart(2, '0')} 待替换封面</span>
+                        </div>
+                    </div>
+                    <div class="mt-3 text-center">
+                        <p class="text-[10px] font-bold text-stone-700 leading-tight tracking-tight line-clamp-1">
+                            [科普脚本作品 ${index + 1} | 待填标题]
+                        </p>
+                        <p class="text-[8px] text-stone-400 mt-1 font-mono">CLICK TO OPEN</p>
+                    </div>
+                `;
+                
+                card.addEventListener('mouseleave', () => {
+                    card.style.transform = `rotate(${randomRotate}deg)`;
+                });
+                
+                grid.appendChild(card);
+            });
+            lucide.createIcons();
+        }
+
+        // ==================== 4. 文件夹翻开/闭合交互动画控制 ====================
+        function openFolder() {
+            const cover = document.getElementById('folder-cover');
+            const opened = document.getElementById('folder-opened');
+
+            cover.style.transform = "rotate(-25deg) translate(-150px, -150px) scale(0.6)";
+            cover.style.opacity = "0";
+            
+            setTimeout(() => {
+                cover.classList.add('hidden');
+                opened.classList.remove('hidden');
+                opened.style.transform = "scale(0.95)";
+                opened.style.opacity = "0";
+                setTimeout(() => {
+                    opened.style.transform = "scale(1)";
+                    opened.style.opacity = "1";
+                    lucide.createIcons();
+                }, 50);
+            }, 300);
+        }
+
+        function closeFolder() {
+            const cover = document.getElementById('folder-cover');
+            const opened = document.getElementById('folder-opened');
+
+            opened.style.transform = "scale(0.95)";
+            opened.style.opacity = "0";
+
+            setTimeout(() => {
+                opened.classList.add('hidden');
+                cover.classList.remove('hidden');
+                setTimeout(() => {
+                    cover.style.transform = "rotate(0deg) translate(0px, 0px) scale(1)";
+                    cover.style.opacity = "1";
+                }, 50);
+            }, 300);
+        }
+
+        document.getElementById('folder-cover').addEventListener('click', openFolder);
+
+        // ==================== 5. 跨页切换逻辑 (大活页本跨页翻页) ====================
+        const spreads = [1, 2, 3];
+
+        function switchSpread(spreadId) {
+            spreads.forEach(id => {
+                const spreadEl = document.getElementById(`spread-${id}`);
+                const tabBtn = document.getElementById(`tab-btn-${id}`);
+                
+                if (id === spreadId) {
+                    spreadEl.classList.remove('hidden');
+                    spreadEl.classList.add('page-flip-anim'); // 触发精细翻页动画
+                    // 激活的索引卡样式凸显 [2.1]
+                    tabBtn.className = "px-2.5 py-3.5 bg-[#fbfaf7] text-stone-900 border border-stone-300 border-r-transparent rounded-l-xl text-[9px] font-bold flex flex-col items-center gap-1 transition-all duration-300 w-8 shadow-md z-30 translate-x-[-2px]";
+                } else {
+                    spreadEl.classList.add('hidden');
+                    spreadEl.classList.remove('page-flip-anim');
+                    // 默认未激活索引卡样式折入
+                    tabBtn.className = "px-2 py-3.5 bg-stone-100 text-stone-500 border border-stone-300 border-r-transparent rounded-l-xl text-[9px] font-bold flex flex-col items-center gap-1 transition-all duration-300 w-7 shadow-sm z-10 translate-x-0";
+                }
+            });
+            lucide.createIcons();
+        }
+
+        // ==================== 6. 【内容营销叠叠卡】抽拉风琴展开 ====================
+        function toggleFolder(folderId) {
+            const ids = ['writing', 'brand', 'red'];
+            ids.forEach(id => {
+                const content = document.getElementById(`content-${id}`);
+                const icon = document.getElementById(`icon-${id}`);
+                const mainDiv = document.getElementById(`fold-${id}`);
+                
+                if (id === folderId) {
+                    const isHidden = content.classList.contains('hidden');
+                    if (isHidden) {
+                        content.classList.remove('hidden');
+                        icon.style.transform = "rotate(180deg)";
+                        mainDiv.style.transform = "scale(1.01)";
+                        mainDiv.classList.add('shadow-md');
+                    } else {
+                        content.classList.add('hidden');
+                        icon.style.transform = "rotate(0deg)";
+                        mainDiv.style.transform = "scale(1)";
+                        mainDiv.classList.remove('shadow-md');
+                    }
+                } else {
+                    content.classList.add('hidden');
+                    icon.style.transform = "rotate(0deg)";
+                    mainDiv.style.transform = "scale(1)";
+                    mainDiv.classList.remove('shadow-md');
+                }
+            });
+        }
+
+        window.onload = () => {
+            lucide.createIcons();
+            buildScienceDossier();
+            switchSpread(1); // 默认打开第一跨页
+            toggleFolder('red'); // 内容营销中默认拉开你最硬核的第三张粉卡小红书爆款
+        };
+    </script>
+</body>
+</html>
