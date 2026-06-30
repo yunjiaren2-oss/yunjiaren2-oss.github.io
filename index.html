@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人作品集 | 内容运营 & 增长营销专家</title>
+    <!-- 引入 Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 Lucide 图标库用于修饰 -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased">
+
+    <!-- 导航栏 -->
+    <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-100">
+        <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+            <span class="text-xl font-bold tracking-tight text-indigo-600">Growth & Content.</span>
+            <nav class="hidden md:flex space-x-8 text-sm font-medium text-slate-600">
+                <a href="#hero" class="hover:text-indigo-600 transition">首页</a>
+                <a href="#metrics" class="hover:text-indigo-600 transition">核心数据</a>
+                <a href="#projects" class="hover:text-indigo-600 transition">精选案例</a>
+                <a href="#skills" class="hover:text-indigo-600 transition">专业技能</a>
+            </nav>
+            <a href="#contact" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition shadow-sm">联系我</a>
+        </div>
+    </header>
+
+    <!-- 1. Hero 视觉首屏 -->
+    <section id="hero" class="max-w-6xl mx-auto px-6 py-16 md:py-24 grid md:grid-cols-12 gap-12 items-center">
+        <div class="md:col-span-7 space-y-6">
+            <div class="inline-flex items-center gap-2 bg-indigo-50 border border-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-xs font-semibold">
+                <span class="flex h-2 w-2 relative">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+                </span>
+                开放工作机会 / 咨询合作
+            </div>
+            <h1 class="text-4xl md:text-5xl font-black tracking-tight text-slate-900 leading-tight">
+                用<span class="text-indigo-600">优质内容</span>驱动用户增长，<br>
+                用<span class="text-indigo-600">数据分析</span>赋能业务变现。
+            </h1>
+            <p class="text-lg text-slate-600 leading-relaxed max-w-xl">
+                你好，我是 [你的名字]。拥有 [X] 年互联网运营经验，专注在内容营销、爆款打造、用户生命周期价值（LTV）提升。擅长将创意内容与增长模型结合，实现业务的可持续增长。
+            </p>
+            <div class="flex flex-wrap gap-4 pt-2">
+                <a href="#projects" class="bg-slate-900 hover:bg-slate-800 text-white px-6 py-3 rounded-lg text-base font-medium transition shadow-md">
+                    浏览精选项目
+                </a>
+                <a href="#contact" class="bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 px-6 py-3 rounded-lg text-base font-medium transition">
+                    聊聊合作意向
+                </a>
+            </div>
+        </div>
+        <!-- 右侧头像/视觉图（运营人通常可以放一张亲和力强的职业照或抽象增长模型图） -->
+        <div class="md:col-span-5 flex justify-center">
+            <div class="relative w-72 h-72 md:w-80 md:h-80 bg-gradient-to-tr from-indigo-500 to-purple-500 rounded-3xl shadow-xl overflow-hidden flex items-center justify-center">
+                <!-- 这里你可以替换成你自己的照片链接 -->
+                <!-- <img src="your-photo.jpg" alt="Profile" class="object-cover w-full h-full"> -->
+                <div class="text-white text-center p-6">
+                    <i data-lucide="trending-up" class="w-16 h-16 mx-auto mb-4 opacity-90"></i>
+                    <p class="font-semibold text-lg">内容即产品 · 数据即方向</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. 核心成果看板（用数据自证） -->
+    <section id="metrics" class="bg-white border-y border-slate-100 py-12">
+        <div class="max-w-6xl mx-auto px-6">
+            <h2 class="text-center text-sm font-semibold uppercase tracking-wider text-slate-400 mb-8">用数据说话 · 我的核心增长战绩</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+                <div class="text-center">
+                    <p class="text-4xl md:text-5xl font-extrabold text-indigo-600">10M+</p>
+                    <p class="text-sm font-medium text-slate-500 mt-2">全网内容曝光量</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-4xl md:text-5xl font-extrabold text-indigo-600">150%</p>
+                    <p class="text-sm font-medium text-slate-500 mt-2">私域转化率提升</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-4xl md:text-5xl font-extrabold text-indigo-600">50W+</p>
+                    <p class="text-sm font-medium text-slate-500 mt-2">孵化/获客规模</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-4xl md:text-5xl font-extrabold text-indigo-600">2.5倍</p>
+                    <p class="text-sm font-medium text-slate-500 mt-2">ROI (投资回报率)</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. 精选案例区（STAR 法则呈现） -->
+    <section id="projects" class="max-w-6xl mx-auto px-6 py-20">
+        <div class="text-center max-w-2xl mx-auto mb-16">
+            <h2 class="text-3xl font-bold tracking-tight text-slate-900">精选案例拆解</h2>
+            <p class="text-slate-600 mt-4">每一个项目，都是对用户洞察、爆款文案和转化路径的严谨落地。</p>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-8">
+            <!-- 案例 1 -->
+            <div class="bg-white rounded-2xl border border-slate-100 p-8 shadow-sm hover:shadow-md transition">
+                <span class="text-xs font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded">内容营销</span>
+                <h3 class="text-xl font-bold text-slate-900 mt-4 mb-3">某 SaaS 产品知乎/小红书冷启动获客项目</h3>
+                <p class="text-slate-600 text-sm leading-relaxed mb-6">
+                    <strong>背景：</strong>预算极低的情况下，需要在一个月内获取第一批高意向 B 端线索。<br>
+                    <strong>行动：</strong>通过打磨10个高价值干货话题，建立矩阵进行内容深耕，配合自动化线索收集工具。<br>
+                    <strong>结果：</strong>实现自然搜索曝光 100k+，低成本获取 300+ 核心 B 端精准客户，获客成本降低 60%。
+                </p>
+                <div class="flex items-center gap-2 text-sm font-semibold text-indigo-600">
+                    <span>查看详细拆解</span>
+                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </div>
+            </div>
+
+            <!-- 案例 2 -->
+            <div class="bg-white rounded-2xl border border-slate-100 p-8 shadow-sm hover:shadow-md transition">
+                <span class="text-xs font-bold uppercase tracking-wider text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded">裂变营销</span>
+                <h3 class="text-xl font-bold text-slate-900 mt-4 mb-3">教育硬件新品发售：老带新裂变拉新活动</h3>
+                <p class="text-slate-600 text-sm leading-relaxed mb-6">
+                    <strong>背景：</strong>配合新品上市，提高品牌的私域蓄水池用户规模。<br>
+                    <strong>行动：</strong>设计“内容共创+阶梯拼团”的裂变机制。利用 AI 工具辅助批量产出朋友圈海报文案及宣发素材。<br>
+                    <strong>结果：</strong>活动 7 天内为企业微信带来 1.2W+ 新增好友，活动裂变层级达到 5 层，直接拉动新品预约量超预期 150%。
+                </p>
+                <div class="flex items-center gap-2 text-sm font-semibold text-indigo-600">
+                    <span>查看详细拆解</span>
+                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. 专业技能与工具库 -->
+    <section id="skills" class="bg-white py-20 border-t border-slate-100">
+        <div class="max-w-6xl mx-auto px-6 grid md:grid-cols-12 gap-12">
+            <div class="md:col-span-4">
+                <h2 class="text-3xl font-bold tracking-tight text-slate-900">运营方法论 <br>& 专业工具箱</h2>
+                <p class="text-slate-600 mt-4">
+                    紧跟 AI 时代的运营人，熟练使用各种数据分析与 AI 提效工具，保障交付质量与效率。
+                </p>
+            </div>
+            <div class="md:col-span-8 grid grid-cols-2 gap-6">
+                <!-- 技能项 -->
+                <div class="p-6 bg-slate-50 rounded-xl">
+                    <h4 class="font-bold text-slate-900 mb-2">内容策划与文案</h4>
+                    <p class="text-xs text-slate-500">爆款标题拆解、SEO 友好内容、知乎/小红书/公众号矩阵运营。</p>
+                </div>
+                <div class="p-6 bg-slate-50 rounded-xl">
+                    <h4 class="font-bold text-slate-900 mb-2">数据分析与漏斗优化</h4>
+                    <p class="text-xs text-slate-500">AARRR 漏斗模型分析、Google Analytics、转化路径 A/B 测试。</p>
+                </div>
+                <div class="p-6 bg-slate-50 rounded-xl">
+                    <h4 class="font-bold text-slate-900 mb-2">AI 协同增效</h4>
+                    <p class="text-xs text-slate-500">熟练使用 ChatGPT/Claude 产出文案、Midjourney 生成配图，效率提升 3 倍。</p>
+                </div>
+                <div class="p-6 bg-slate-50 rounded-xl">
+                    <h4 class="font-bold text-slate-900 mb-2">用户成长与生命周期</h4>
+                    <p class="text-xs text-slate-500">私域精细化运营、社群裂变促活、关键节点流失预警与唤醒。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. 底部联系与 CTA 转化 -->
+    <section id="contact" class="max-w-4xl mx-auto px-6 py-20 text-center">
+        <div class="bg-indigo-900 text-white rounded-3xl p-8 md:p-12 shadow-xl space-y-6">
+            <h2 class="text-3xl font-bold">期待与你共同创造下一次增长</h2>
+            <p class="text-indigo-200 max-w-md mx-auto text-sm leading-relaxed">
+                无论是全职工作机会、项目顾问咨询，还是内容合作，我都非常乐意交流。
+            </p>
+            <div class="flex flex-col sm:flex-row justify-center items-center gap-4 pt-4">
+                <a href="mailto:your_email@example.com" class="bg-white text-indigo-900 font-semibold px-6 py-3 rounded-lg hover:bg-indigo-50 transition w-full sm:w-auto">
+                    发送邮件联系我
+                </a>
+                <div class="text-sm text-indigo-200">
+                    或者微信: <span class="font-mono bg-indigo-800 px-2 py-1 rounded select-all text-white">your_wechat_id</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer class="border-t border-slate-200 bg-white py-8 text-center text-xs text-slate-400">
+        <p>© 2026 [你的名字]. All rights reserved. Built with Code & AI.</p>
+    </footer>
+
+    <!-- 初始化图标 -->
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>
