@@ -1,191 +1,417 @@
 <!DOCTYPE html>
-<html lang="zh-CN" class="scroll-smooth">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>个人作品集 | 内容运营 & 增长营销专家</title>
-    <!-- 引入 Tailwind CSS CDN -->
+    <title>任蕴佳 (Yunjia Ren) | 个人档案浏览器</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- 引入 Lucide 图标库用于修饰 -->
+    <!-- Lucide 图标 -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* 针对拟物化文件管理器的微调 */
+        .no-select { user-select: none; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { bg-color: transparent; }
+        ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+    </style>
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans antialiased">
+<body class="bg-gradient-to-br from-zinc-100 to-zinc-200 text-zinc-800 font-sans antialiased h-screen w-screen overflow-hidden flex items-center justify-center p-4">
 
-    <!-- 导航栏 -->
-    <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-100">
-        <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
-            <span class="text-xl font-bold tracking-tight text-indigo-600">Growth & Content.</span>
-            <nav class="hidden md:flex space-x-8 text-sm font-medium text-slate-600">
-                <a href="#hero" class="hover:text-indigo-600 transition">首页</a>
-                <a href="#metrics" class="hover:text-indigo-600 transition">核心数据</a>
-                <a href="#projects" class="hover:text-indigo-600 transition">精选案例</a>
-                <a href="#skills" class="hover:text-indigo-600 transition">专业技能</a>
-            </nav>
-            <a href="#contact" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition shadow-sm">联系我</a>
-        </div>
-    </header>
-
-    <!-- 1. Hero 视觉首屏 -->
-    <section id="hero" class="max-w-6xl mx-auto px-6 py-16 md:py-24 grid md:grid-cols-12 gap-12 items-center">
-        <div class="md:col-span-7 space-y-6">
-            <div class="inline-flex items-center gap-2 bg-indigo-50 border border-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-xs font-semibold">
-                <span class="flex h-2 w-2 relative">
-                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-                    <span class="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
-                </span>
-                开放工作机会 / 咨询合作
+    <!-- 主窗口（模拟 macOS Finder / Win 资源管理器） -->
+    <div class="w-full max-w-5xl h-[85vh] bg-white rounded-2xl border border-zinc-300 shadow-2xl flex flex-col overflow-hidden">
+        
+        <!-- 1. 窗口控制栏 (Titlebar) -->
+        <div class="h-12 bg-zinc-100 border-b border-zinc-200 px-4 flex items-center justify-between no-select">
+            <!-- 左侧三色交通灯按钮 -->
+            <div class="flex items-center gap-2">
+                <span class="w-3 h-3 rounded-full bg-red-400 block border border-red-500/30"></span>
+                <span class="w-3 h-3 rounded-full bg-yellow-400 block border border-yellow-500/30"></span>
+                <span class="w-3 h-3 rounded-full bg-green-400 block border border-green-500/30"></span>
+                <span class="text-xs font-semibold text-zinc-400 ml-4 tracking-wider">RENYUNJIA_OS_v1.0</span>
             </div>
-            <h1 class="text-4xl md:text-5xl font-black tracking-tight text-slate-900 leading-tight">
-                用<span class="text-indigo-600">优质内容</span>驱动用户增长，<br>
-                用<span class="text-indigo-600">数据分析</span>赋能业务变现。
-            </h1>
-            <p class="text-lg text-slate-600 leading-relaxed max-w-xl">
-                你好，我是 [你的名字]。拥有 [X] 年互联网运营经验，专注在内容营销、爆款打造、用户生命周期价值（LTV）提升。擅长将创意内容与增长模型结合，实现业务的可持续增长。
-            </p>
-            <div class="flex flex-wrap gap-4 pt-2">
-                <a href="#projects" class="bg-slate-900 hover:bg-slate-800 text-white px-6 py-3 rounded-lg text-base font-medium transition shadow-md">
-                    浏览精选项目
-                </a>
-                <a href="#contact" class="bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 px-6 py-3 rounded-lg text-base font-medium transition">
-                    聊聊合作意向
-                </a>
+            <!-- 面包屑路径指示器 -->
+            <div class="bg-zinc-200/60 rounded-lg px-3 py-1 text-xs text-zinc-600 font-mono flex items-center gap-1.5 border border-zinc-300/40">
+                <i data-lucide="hard-drive" class="w-3.5 h-3.5 text-zinc-500"></i>
+                <span>Root</span>
+                <span class="text-zinc-400">></span>
+                <span id="path-indicator" class="font-medium text-zinc-900">Desktop</span>
             </div>
-        </div>
-        <!-- 右侧头像/视觉图（运营人通常可以放一张亲和力强的职业照或抽象增长模型图） -->
-        <div class="md:col-span-5 flex justify-center">
-            <div class="relative w-72 h-72 md:w-80 md:h-80 bg-gradient-to-tr from-indigo-500 to-purple-500 rounded-3xl shadow-xl overflow-hidden flex items-center justify-center">
-                <!-- 这里你可以替换成你自己的照片链接 -->
-                <!-- <img src="your-photo.jpg" alt="Profile" class="object-cover w-full h-full"> -->
-                <div class="text-white text-center p-6">
-                    <i data-lucide="trending-up" class="w-16 h-16 mx-auto mb-4 opacity-90"></i>
-                    <p class="font-semibold text-lg">内容即产品 · 数据即方向</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- 2. 核心成果看板（用数据自证） -->
-    <section id="metrics" class="bg-white border-y border-slate-100 py-12">
-        <div class="max-w-6xl mx-auto px-6">
-            <h2 class="text-center text-sm font-semibold uppercase tracking-wider text-slate-400 mb-8">用数据说话 · 我的核心增长战绩</h2>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
-                <div class="text-center">
-                    <p class="text-4xl md:text-5xl font-extrabold text-indigo-600">10M+</p>
-                    <p class="text-sm font-medium text-slate-500 mt-2">全网内容曝光量</p>
-                </div>
-                <div class="text-center">
-                    <p class="text-4xl md:text-5xl font-extrabold text-indigo-600">150%</p>
-                    <p class="text-sm font-medium text-slate-500 mt-2">私域转化率提升</p>
-                </div>
-                <div class="text-center">
-                    <p class="text-4xl md:text-5xl font-extrabold text-indigo-600">50W+</p>
-                    <p class="text-sm font-medium text-slate-500 mt-2">孵化/获客规模</p>
-                </div>
-                <div class="text-center">
-                    <p class="text-4xl md:text-5xl font-extrabold text-indigo-600">2.5倍</p>
-                    <p class="text-sm font-medium text-slate-500 mt-2">ROI (投资回报率)</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- 3. 精选案例区（STAR 法则呈现） -->
-    <section id="projects" class="max-w-6xl mx-auto px-6 py-20">
-        <div class="text-center max-w-2xl mx-auto mb-16">
-            <h2 class="text-3xl font-bold tracking-tight text-slate-900">精选案例拆解</h2>
-            <p class="text-slate-600 mt-4">每一个项目，都是对用户洞察、爆款文案和转化路径的严谨落地。</p>
+            <!-- 右侧占位 -->
+            <div class="w-16"></div>
         </div>
 
-        <div class="grid md:grid-cols-2 gap-8">
-            <!-- 案例 1 -->
-            <div class="bg-white rounded-2xl border border-slate-100 p-8 shadow-sm hover:shadow-md transition">
-                <span class="text-xs font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded">内容营销</span>
-                <h3 class="text-xl font-bold text-slate-900 mt-4 mb-3">某 SaaS 产品知乎/小红书冷启动获客项目</h3>
-                <p class="text-slate-600 text-sm leading-relaxed mb-6">
-                    <strong>背景：</strong>预算极低的情况下，需要在一个月内获取第一批高意向 B 端线索。<br>
-                    <strong>行动：</strong>通过打磨10个高价值干货话题，建立矩阵进行内容深耕，配合自动化线索收集工具。<br>
-                    <strong>结果：</strong>实现自然搜索曝光 100k+，低成本获取 300+ 核心 B 端精准客户，获客成本降低 60%。
-                </p>
-                <div class="flex items-center gap-2 text-sm font-semibold text-indigo-600">
-                    <span>查看详细拆解</span>
-                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+        <!-- 2. 主体内容区 -->
+        <div class="flex-1 flex overflow-hidden">
+            
+            <!-- 左侧导航边栏 (Sidebar) -->
+            <aside class="w-60 bg-zinc-50 border-r border-zinc-200 p-4 space-y-6 flex flex-col justify-between no-select">
+                <div class="space-y-4">
+                    <p class="text-[10px] font-bold tracking-wider text-zinc-400 uppercase px-2">档案快捷通道</p>
+                    <nav class="space-y-1 text-sm font-medium">
+                        <button onclick="changeFolder('desktop')" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-zinc-700 hover:bg-zinc-200/70 transition text-left sidebar-btn" id="btn-desktop">
+                            <i data-lucide="monitor" class="w-4 h-4 text-zinc-500"></i> 桌面主页
+                        </button>
+                        <button onclick="changeFolder('growth')" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-zinc-700 hover:bg-zinc-200/70 transition text-left sidebar-btn" id="btn-growth">
+                            <i data-lucide="folder" class="w-4 h-4 text-amber-500"></i> 01_增长与战役
+                        </button>
+                        <button onclick="changeFolder('content')" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-zinc-700 hover:bg-zinc-200/70 transition text-left sidebar-btn" id="btn-content">
+                            <i data-lucide="folder" class="w-4 h-4 text-blue-500"></i> 02_深度编辑与内容
+                        </button>
+                        <button onclick="changeFolder('config')" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-zinc-700 hover:bg-zinc-200/70 transition text-left sidebar-btn" id="btn-config">
+                            <i data-lucide="folder" class="w-4 h-4 text-zinc-500"></i> 03_学术与技能
+                        </button>
+                    </nav>
                 </div>
-            </div>
+                
+                <!-- 底部简要卡片 -->
+                <div class="bg-zinc-200/40 p-3 rounded-xl border border-zinc-200">
+                    <p class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1">系统状态</p>
+                    <p class="text-xs text-zinc-600 font-medium">双击右侧文件图标可查看详情</p>
+                </div>
+            </aside>
 
-            <!-- 案例 2 -->
-            <div class="bg-white rounded-2xl border border-slate-100 p-8 shadow-sm hover:shadow-md transition">
-                <span class="text-xs font-bold uppercase tracking-wider text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded">裂变营销</span>
-                <h3 class="text-xl font-bold text-slate-900 mt-4 mb-3">教育硬件新品发售：老带新裂变拉新活动</h3>
-                <p class="text-slate-600 text-sm leading-relaxed mb-6">
-                    <strong>背景：</strong>配合新品上市，提高品牌的私域蓄水池用户规模。<br>
-                    <strong>行动：</strong>设计“内容共创+阶梯拼团”的裂变机制。利用 AI 工具辅助批量产出朋友圈海报文案及宣发素材。<br>
-                    <strong>结果：</strong>活动 7 天内为企业微信带来 1.2W+ 新增好友，活动裂变层级达到 5 层，直接拉动新品预约量超预期 150%。
-                </p>
-                <div class="flex items-center gap-2 text-sm font-semibold text-indigo-600">
-                    <span>查看详细拆解</span>
-                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            <!-- 右侧文件网格/文件阅读器 -->
+            <main class="flex-1 bg-white flex flex-col overflow-y-auto p-6" id="explorer-view">
+                <!-- 动态生成文件列表区域 -->
+                <div id="file-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
+                    <!-- 文件图标将通过 JS 动态注入 -->
                 </div>
-            </div>
+            </main>
+
+            <!-- 文件阅读器窗口 (默认隐藏) -->
+            <section id="reader-view" class="hidden flex-1 bg-white p-8 overflow-y-auto flex flex-col justify-between">
+                <div class="space-y-6">
+                    <!-- 返回与标题 -->
+                    <div class="flex items-center gap-4 pb-4 border-b border-zinc-200">
+                        <button onclick="closeReader()" class="p-2 hover:bg-zinc-100 rounded-lg text-zinc-500 hover:text-zinc-900 transition">
+                            <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                        </button>
+                        <div>
+                            <span id="reader-tag" class="text-[10px] font-bold uppercase tracking-wider bg-zinc-100 text-zinc-600 px-2 py-0.5 rounded">Tag</span>
+                            <h2 id="reader-title" class="text-2xl font-serif font-medium text-zinc-900 mt-1">文件名称</h2>
+                        </div>
+                    </div>
+                    <!-- 动态内容渲染 -->
+                    <article id="reader-body" class="prose prose-stone max-w-none text-zinc-600 leading-relaxed font-light text-sm md:text-base space-y-4">
+                        <!-- 内容 -->
+                    </article>
+                </div>
+                <div class="pt-12 border-t border-zinc-100 mt-12 flex justify-between items-center text-xs text-zinc-400">
+                    <span>最后修改：2026/06/30</span>
+                    <span>字符数已压缩以防数据冗余</span>
+                </div>
+            </section>
+
         </div>
-    </section>
+    </div>
 
-    <!-- 4. 专业技能与工具库 -->
-    <section id="skills" class="bg-white py-20 border-t border-slate-100">
-        <div class="max-w-6xl mx-auto px-6 grid md:grid-cols-12 gap-12">
-            <div class="md:col-span-4">
-                <h2 class="text-3xl font-bold tracking-tight text-slate-900">运营方法论 <br>& 专业工具箱</h2>
-                <p class="text-slate-600 mt-4">
-                    紧跟 AI 时代的运营人，熟练使用各种数据分析与 AI 提效工具，保障交付质量与效率。
-                </p>
-            </div>
-            <div class="md:col-span-8 grid grid-cols-2 gap-6">
-                <!-- 技能项 -->
-                <div class="p-6 bg-slate-50 rounded-xl">
-                    <h4 class="font-bold text-slate-900 mb-2">内容策划与文案</h4>
-                    <p class="text-xs text-slate-500">爆款标题拆解、SEO 友好内容、知乎/小红书/公众号矩阵运营。</p>
-                </div>
-                <div class="p-6 bg-slate-50 rounded-xl">
-                    <h4 class="font-bold text-slate-900 mb-2">数据分析与漏斗优化</h4>
-                    <p class="text-xs text-slate-500">AARRR 漏斗模型分析、Google Analytics、转化路径 A/B 测试。</p>
-                </div>
-                <div class="p-6 bg-slate-50 rounded-xl">
-                    <h4 class="font-bold text-slate-900 mb-2">AI 协同增效</h4>
-                    <p class="text-xs text-slate-500">熟练使用 ChatGPT/Claude 产出文案、Midjourney 生成配图，效率提升 3 倍。</p>
-                </div>
-                <div class="p-6 bg-slate-50 rounded-xl">
-                    <h4 class="font-bold text-slate-900 mb-2">用户成长与生命周期</h4>
-                    <p class="text-xs text-slate-500">私域精细化运营、社群裂变促活、关键节点流失预警与唤醒。</p>
-                </div>
-            </div>
-        </div>
-    </section>
+    <!-- 模拟桌面页脚 -->
+    <div class="absolute bottom-2 text-center text-[10px] tracking-wider text-zinc-400 font-mono uppercase no-select">
+        © 2026 YUNJIA REN OS · Double click files to expand dossier
+    </div>
 
-    <!-- 5. 底部联系与 CTA 转化 -->
-    <section id="contact" class="max-w-4xl mx-auto px-6 py-20 text-center">
-        <div class="bg-indigo-900 text-white rounded-3xl p-8 md:p-12 shadow-xl space-y-6">
-            <h2 class="text-3xl font-bold">期待与你共同创造下一次增长</h2>
-            <p class="text-indigo-200 max-w-md mx-auto text-sm leading-relaxed">
-                无论是全职工作机会、项目顾问咨询，还是内容合作，我都非常乐意交流。
-            </p>
-            <div class="flex flex-col sm:flex-row justify-center items-center gap-4 pt-4">
-                <a href="mailto:your_email@example.com" class="bg-white text-indigo-900 font-semibold px-6 py-3 rounded-lg hover:bg-indigo-50 transition w-full sm:w-auto">
-                    发送邮件联系我
-                </a>
-                <div class="text-sm text-indigo-200">
-                    或者微信: <span class="font-mono bg-indigo-800 px-2 py-1 rounded select-all text-white">your_wechat_id</span>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- 页脚 -->
-    <footer class="border-t border-slate-200 bg-white py-8 text-center text-xs text-slate-400">
-        <p>© 2026 [你的名字]. All rights reserved. Built with Code & AI.</p>
-    </footer>
-
-    <!-- 初始化图标 -->
     <script>
-        lucide.createIcons();
+        // 1. 模拟文件数据结构 (文案已去传统化、有趣化)
+        const fileDatabase = {
+            readme: {
+                id: 'readme',
+                title: 'README_任蕴佳.txt',
+                tag: 'README',
+                icon: 'file-text',
+                color: 'text-zinc-500',
+                html: `
+                    <p class="font-serif text-lg text-zinc-800 italic mb-6">“一个将新传人文情怀，完美注入AI产品增长的内容营销人。”</p>
+                    <p>嗨，我是 <strong>任蕴佳</strong>，24岁，一个爱思考、点子多、同时拥有重度 Owner 意识的内容增长玩家。</p>
+                    <div class="my-6 p-4 bg-zinc-50 border border-zinc-200 rounded-xl space-y-2">
+                        <p class="font-bold text-zinc-900">🚀 核心核心硬通货：</p>
+                        <ul class="list-disc pl-5 text-sm space-y-1">
+                            <li><strong>同济大学 + 北京外国语大学</strong> 的纯正新传学科底子。</li>
+                            <li><strong>10w+ 爆款流水线：</strong> 具备从选题到复盘的“从0到1”内容全闭环能力，产出过数篇 10w+ 爆款文案。</li>
+                            <li><strong>AI 提效践行者：</strong> 实操过海外 AI 视频冷启动、KOS 矩阵，熟练使用 AIGC 工具。</li>
+                            <li><strong>线下大展操盘手：</strong> 曾主导并落地 4W+ 观展人数的线下大型艺术展（没错，能写也能打）。</li>
+                        </ul>
+                    </div>
+                    <p>对我而言，内容不是冰冷的字符，而是连接用户、触动情绪并带来<strong>真实业务增长</strong>的武器。</p>
+                `
+            },
+            red_ai: {
+                id: 'red_ai',
+                title: '小红书_AI产品增长.md',
+                tag: 'AI Growth',
+                icon: 'file-code',
+                color: 'text-rose-500',
+                html: `
+                    <h3 class="font-bold text-zinc-900 text-lg mb-2">项目背景</h3>
+                    <p>围绕小红书AI记录产品的新增用户指标，搭建达人/KOS内容增长体系。</p>
+                    <h3 class="font-bold text-zinc-900 text-lg mt-4 mb-2">我的核心攻坚战</h3>
+                    <ul class="list-disc pl-5 text-sm space-y-2">
+                        <li><strong>10+ 核心社群 / 200+ 达人筛选与共创：</strong> 建立达人筛选、内容共创、账号孵化及投放优化的完整 KOS 体系。</li>
+                        <li><strong>爆发式单条：</strong> 结合热点洞察和内容测试，实现新账号单条最高 <strong>12w+ 播放</strong>，成熟账号稳定 <strong>9w+ 播放</strong>。</li>
+                        <li><strong>AI 协同闭环：</strong> 引入 AIGC 工具优化选题，极大缩短了“热点洞察—内容策划—效果复盘”的循环周期。</li>
+                        <li><strong>出海冷启动：</strong> 熟练驾驭 Prompt，使用 AI 视频生成工具及数字人出海，支持海外多账户内容不间断冷启动。</li>
+                    </ul>
+                    <div class="mt-6 p-4 bg-rose-50 border border-rose-100 rounded-xl">
+                        <span class="font-bold text-rose-700">📈 增长战报：</span>
+                        产品新增用户暴增 <strong class="text-rose-800">412%</strong>，活跃用户增长 <strong class="text-rose-800">58%</strong>，启动次数大幅提升 <strong class="text-rose-800">91%</strong>！
+                    </div>
+                `
+            },
+            xinshixiang: {
+                id: 'xinshixiang',
+                title: '新世相_千万级曝光战役.md',
+                tag: 'Creative Campaign',
+                icon: 'file-text',
+                color: 'text-emerald-500',
+                html: `
+                    <h3 class="font-bold text-zinc-900 text-lg mb-2">战役一：晚安短信 (线下大型营销)</h3>
+                    <p>负责线下活动的多方协调、策划与传播。成功将传统情怀化为全网热点。</p>
+                    <div class="my-3 text-sm bg-zinc-50 p-3 rounded-lg border border-zinc-200">
+                        📊 成果：登上小红书热点榜，<strong>累计阅读达 1897.9万、讨论 22.7万</strong>。
+                    </div>
+
+                    <h3 class="font-bold text-zinc-900 text-lg mt-4 mb-2">战役二：给100位女性长辈的画展</h3>
+                    <p>作为核心 Owner，从0到1推动画展线下展览策划、传播和资源统筹。将品牌理念深刻卷入现实社会关系。</p>
+                    <div class="my-3 text-sm bg-zinc-50 p-3 rounded-lg border border-zinc-200">
+                        📊 成果：实现<strong>线下观展 4W+ 人次</strong>，话题浏览 16W+，获得多家主流媒体的主动报道。
+                    </div>
+
+                    <h3 class="font-bold text-zinc-900 text-lg mt-4 mb-2">品牌爆款常态化</h3>
+                    <p>服务美团、奥迪等大厂内容营销，微信公众号单篇阅读 <strong>10w+</strong>，小红书内容斩获千赞。</p>
+                `
+            },
+            momo: {
+                id: 'momo',
+                title: '陌陌_校园社交冷启动.md',
+                tag: 'User Growth',
+                icon: 'file-heart',
+                color: 'text-purple-500',
+                html: `
+                    <h3 class="font-bold text-zinc-900 text-lg mb-2">主要职能</h3>
+                    <p>负责校园社交产品增长及社群运营。主打精细化社区氛围建立与私域流量池搭建。</p>
+                    <h3 class="font-bold text-zinc-900 text-lg mt-4 mb-2">实操手段</h3>
+                    <ul class="list-disc pl-5 text-sm space-y-2">
+                        <li><strong>校园大使网络：</strong> 招募并管理覆盖 10 所高校的 20+ 校园大使，通过话题策划和内容预埋激活校园 UGC。</li>
+                        <li><strong>私域种子群：</strong> 搭建种子用户私域群并精细化运营，活跃发帖和互动频次，带动社区普通用户的自发发帖。</li>
+                        <li><strong>520 颜王争霸赛：</strong> 参与活动的核心方案策划，利用线上社交裂变机制实现阶段性爆发式拉新。</li>
+                    </ul>
+                `
+            },
+            science_scripts_lnk: {
+                id: 'science_scripts_lnk',
+                title: '科普类漫画脚本(20+篇).lnk',
+                tag: 'Link / 快捷方式',
+                icon: 'external-link',
+                color: 'text-amber-500',
+                html: `
+                    <div class="text-center py-8 space-y-4">
+                        <div class="p-4 bg-amber-50 text-amber-700 rounded-full w-fit mx-auto">
+                            <i data-lucide="book-open" class="w-12 h-12"></i>
+                        </div>
+                        <h3 class="font-bold text-zinc-900 text-xl">已为你建立直达作品展厅的快捷通道</h3>
+                        <p class="text-zinc-500 text-sm max-w-sm mx-auto">
+                            在这里，收录了我四年脚本策划的创作结晶。包含 20+ 篇转化优质的科普作品，单篇阅读量 10w+，被央视、科普中国等多家头部平台转载。
+                        </p>
+                        <div class="pt-4">
+                            <a href="./science-scripts.html" class="inline-flex items-center gap-2 bg-stone-900 hover:bg-stone-800 text-white px-6 py-3 rounded-lg text-sm font-semibold transition shadow-md">
+                                进入科普脚本展厅 <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                            </a>
+                        </div>
+                    </div>
+                `
+            },
+            the_paper: {
+                id: 'the_paper',
+                title: '澎湃新闻_调查报道.md',
+                tag: 'Journalism',
+                icon: 'file-text',
+                color: 'text-blue-500',
+                html: `
+                    <h3 class="font-bold text-zinc-900 text-lg mb-2">职能：实习记者 | 调查新闻部</h3>
+                    <p>紧追社会民生热点开展深度调查。凭借扎实的采访、交叉论证能力，独立策划和采写深度内容。</p>
+                    <h3 class="font-bold text-zinc-900 text-lg mt-4 mb-2">核心荣誉</h3>
+                    <ul class="list-disc pl-5 text-sm space-y-2">
+                        <li><strong>舆论监督与企业整改：</strong> 其中多篇重磅调查稿件引发业内极其广泛的讨论，深度介入并成功推动了涉事企业的大型整改。</li>
+                        <li><strong>行业认可：</strong> 产出作品多次获得各大行业媒体的转载。</li>
+                        <li><strong>月度编辑奖：</strong> 凭借极高质量的深度采写，拿下了两项系列报道的<strong>“澎湃新闻月度编辑奖”</strong>。</li>
+                    </ul>
+                `
+            },
+            education: {
+                id: 'education',
+                title: '同济&北外_教育履历.json',
+                tag: 'Education',
+                icon: 'database',
+                color: 'text-indigo-500',
+                html: `
+                    <div class="space-y-6">
+                        <!-- 同济大学 -->
+                        <div class="border-l-4 border-zinc-900 pl-4 space-y-1">
+                            <span class="text-xs text-zinc-400 font-mono">2024.09 - 2027.06</span>
+                            <h4 class="font-bold text-zinc-900 text-base">同济大学 | 硕士</h4>
+                            <p class="text-sm text-zinc-600">艺术与传媒学院 · 新闻传播学 (GPA: 3.91/4.0)</p>
+                            <span class="inline-block bg-zinc-100 text-[10px] text-zinc-500 px-2 py-0.5 rounded">双一流 / 985 / 211</span>
+                        </div>
+                        <!-- 北京外国语大学 -->
+                        <div class="border-l-4 border-zinc-400 pl-4 space-y-1">
+                            <span class="text-xs text-zinc-400 font-mono">2020.09 - 2024.06</span>
+                            <h4 class="font-bold text-zinc-900 text-base">北京外国语大学 | 本科</h4>
+                            <p class="text-sm text-zinc-600">国际新闻与传播学院 · 新闻学 (GPA: 3.6/4.0) | 辅修外交学 (GPA: 3.8/4.0)</p>
+                            <span class="inline-block bg-zinc-100 text-[10px] text-zinc-500 px-2 py-0.5 rounded">双一流 / 211</span>
+                        </div>
+                    </div>
+                `
+            },
+            skills: {
+                id: 'skills',
+                title: '技能与工具链.conf',
+                tag: 'System Config',
+                icon: 'sliders',
+                color: 'text-zinc-600',
+                html: `
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="p-4 bg-zinc-50 border border-zinc-200 rounded-xl">
+                            <h4 class="font-bold text-zinc-900 text-sm mb-2">🎨 视觉与媒介软件</h4>
+                            <p class="text-xs text-zinc-500">熟练掌握 <strong>剪映 / Photoshop / Canva / 秀米</strong> 等高效率排版和设计工具。</p>
+                        </div>
+                        <div class="p-4 bg-zinc-50 border border-zinc-200 rounded-xl">
+                            <h4 class="font-bold text-zinc-900 text-sm mb-2">🗣️ 语言与沟通</h4>
+                            <p class="text-xs text-zinc-500">英语：<strong>CET-6</strong>，具备扎实的双语新闻素材采写与跨文化传播能力。</p>
+                        </div>
+                        <div class="p-4 bg-zinc-50 border border-zinc-200 rounded-xl col-span-2">
+                            <h4 class="font-bold text-zinc-900 text-sm mb-2">💡 爆款特质（系统原装属性）</h4>
+                            <p class="text-xs text-zinc-500">小红书自然曝光单篇突破 <strong>6W+</strong> (获 3k+点赞 / 1k+收藏)。精通小红书、抖音、微信文案底层调性包装。</p>
+                        </div>
+                    </div>
+                `
+            },
+            contact: {
+                id: 'contact',
+                title: '联系方式_Connect.sh',
+                tag: 'Connect',
+                icon: 'terminal',
+                color: 'text-slate-700',
+                html: `
+                    <div class="space-y-4">
+                        <p class="text-sm">很高兴你能一路点击浏览到这里。这里有直接连通我的各种端口：</p>
+                        <div class="bg-zinc-900 text-zinc-100 p-4 rounded-xl font-mono text-xs space-y-2">
+                            <p><span class="text-emerald-400">$</span> cat email.txt</p>
+                            <p class="text-zinc-400">taot1007@163.com</p>
+                            <p><span class="text-emerald-400">$</span> cat phone.txt</p>
+                            <p class="text-zinc-400">15337053496 (上海)</p>
+                            <p><span class="text-emerald-400">$</span> cat wechat.txt</p>
+                            <p class="text-zinc-400">15337053496</p>
+                        </div>
+                        <div class="flex gap-4 pt-4">
+                            <a href="mailto:taot1007@163.com" class="bg-zinc-900 text-white text-xs font-semibold px-4 py-2.5 rounded-lg hover:bg-zinc-800 transition">发送邮件</a>
+                            <button onclick="navigator.clipboard.writeText('15337053496'); alert('微信/手机号已复制到剪贴板！');" class="bg-white border border-zinc-200 text-zinc-700 text-xs font-semibold px-4 py-2.5 rounded-lg hover:bg-zinc-50 transition">一键复制微信</button>
+                        </div>
+                    </div>
+                `
+            }
+        };
+
+        // 2. 模拟目录与文件的映射关系
+        const folderStructure = {
+            desktop: ['readme', 'contact'],
+            growth: ['red_ai', 'xinshixiang', 'momo'],
+            content: ['science_scripts_lnk', 'the_paper'],
+            config: ['education', 'skills']
+        };
+
+        let currentFolder = 'desktop';
+
+        // 3. 渲染指定文件夹中的内容
+        function renderFolder(folderId) {
+            const explorer = document.getElementById('explorer-view');
+            const reader = document.getElementById('reader-view');
+            explorer.classList.remove('hidden');
+            reader.classList.add('hidden');
+
+            const fileGrid = document.getElementById('file-grid');
+            fileGrid.innerHTML = '';
+
+            const filesInFolder = folderStructure[folderId];
+            filesInFolder.forEach(fileId => {
+                const file = fileDatabase[fileId];
+                if (file) {
+                    const card = document.createElement('div');
+                    card.className = "flex flex-col items-center justify-center p-4 rounded-xl hover:bg-zinc-100 cursor-pointer border border-transparent hover:border-zinc-200/50 transition-all text-center no-select group";
+                    // 绑定双击与单击（兼容移动端单触）
+                    card.setAttribute('ondblclick', `openFile('${fileId}')`);
+                    card.setAttribute('onclick', `handleSingleClick('${fileId}')`);
+                    card.innerHTML = `
+                        <div class="p-4 bg-zinc-50 rounded-xl mb-3 shadow-sm group-hover:scale-105 transition-transform">
+                            <i data-lucide="${file.icon}" class="w-8 h-8 ${file.color}"></i>
+                        </div>
+                        <span class="text-xs font-medium text-zinc-700 truncate w-full px-1">${file.title}</span>
+                    `;
+                    fileGrid.appendChild(card);
+                }
+            });
+
+            // 更新面包屑和左边栏激活状态
+            document.getElementById('path-indicator').innerText = folderId === 'desktop' ? 'Desktop' : `Desktop > 📁 ${folderId}`;
+            
+            document.querySelectorAll('.sidebar-btn').forEach(btn => btn.classList.remove('bg-zinc-200', 'text-zinc-900'));
+            const activeBtn = document.getElementById(`btn-${folderId}`);
+            if (activeBtn) {
+                activeBtn.classList.add('bg-zinc-200', 'text-zinc-900');
+            }
+
+            currentFolder = folderId;
+            lucide.createIcons();
+        }
+
+        // 切换文件夹
+        function changeFolder(folderId) {
+            renderFolder(folderId);
+        }
+
+        // 移动端/轻触支持：单击提示，双击或再次点击打开
+        let lastClickedFile = null;
+        let clickTimer = null;
+        function handleSingleClick(fileId) {
+            if (lastClickedFile === fileId) {
+                openFile(fileId);
+                lastClickedFile = null;
+            } else {
+                lastClickedFile = fileId;
+                clearTimeout(clickTimer);
+                clickTimer = setTimeout(() => {
+                    lastClickedFile = null;
+                }, 1000); // 1秒内再次点击则视为双击打开
+            }
+        }
+
+        // 打开文件查看器
+        function openFile(fileId) {
+            const file = fileDatabase[fileId];
+            if (file) {
+                // 如果是脚本的 lnk 快捷方式，并且在移动端，直接展示内容，里面有一个专门的大按钮跳转
+                document.getElementById('explorer-view').classList.add('hidden');
+                
+                const reader = document.getElementById('reader-view');
+                reader.classList.remove('hidden');
+
+                document.getElementById('reader-title').innerText = file.title;
+                document.getElementById('reader-tag').innerText = file.tag;
+                document.getElementById('reader-body').innerHTML = file.html;
+
+                lucide.createIcons();
+            }
+        }
+
+        // 关闭文件查看器
+        function closeReader() {
+            renderFolder(currentFolder);
+        }
+
+        // 页面初始化
+        window.onload = () => {
+            renderFolder('desktop');
+        };
     </script>
 </body>
 </html>
